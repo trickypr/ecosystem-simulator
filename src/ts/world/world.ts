@@ -64,7 +64,7 @@ export class Plant extends Graphics implements IPlant {
     this.on('pointerdown', this.use)
   }
 
-  random(minRegen: number, maxRegen: number, waterObjects: Water[]): Plant {
+  random(minRegen: number, maxRegen: number, objects: any[]): Plant {
     let valid = false
 
     while (!valid) {
@@ -74,7 +74,7 @@ export class Plant extends Graphics implements IPlant {
       this.reGenChance = Math.random() * (maxRegen - minRegen) + minRegen
 
       valid = true
-      waterObjects.forEach(water => {
+      objects.forEach(water => {
         if (water.checkCollision(this.x, this.y, this.size)) valid = false
       })
     }
@@ -103,6 +103,16 @@ export class Plant extends Graphics implements IPlant {
     this.drawCircle(0, 0, this.size)
     this.endFill()
   }
+
+  checkCollision(x: number, y: number, radius: number): boolean {
+    const dx = this.x - x
+    const dy = this.y - y
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < this.size + 2 + radius) return true
+
+    return false
+  }
 }
 
 export class World extends Container implements IWorld {
@@ -117,7 +127,7 @@ export class World extends Container implements IWorld {
     super()
 
     for (let i = 0; i < waterQuantity; i++) this.water.push(new Water().random(minWaterSize, maxWaterSize))
-    for (let i = 0; i < plantQuantity; i++) this.plants.push(new Plant().random(minPlantRegen, maxPlantRegen, this.water))
+    for (let i = 0; i < plantQuantity; i++) this.plants.push(new Plant().random(minPlantRegen, maxPlantRegen, [...this.water, ...this.plants]))
 
     this.water.forEach(water => {
       water.draw()
