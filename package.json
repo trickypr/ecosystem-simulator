@@ -1,0 +1,23 @@
+{
+  "name": "ecosystem",
+  "version": "1.0.0",
+  "description": "An ecosystem simulation to simulate genetics and other such things",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel src/index.html -p 8080",
+    "lint": "eslint ./src/**/*"
+  },
+  "author": "TrickyPR",
+  "license": "GPL-3.0-only",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.10.0",
+    "@typescript-eslint/parser": "^2.10.0",
+    "eslint": "^6.7.2",
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^3.7.3"
+  },
+  "dependencies": {
+    "pixi.js": "^5.2.0"
+  }
+}
