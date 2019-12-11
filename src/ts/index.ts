@@ -1,24 +1,36 @@
-import { Application } from 'pixi.js'
+import { Application, Loader } from 'pixi.js'
 import { size } from './constants'
 import { World } from './world/world'
+import { Animals } from './animals/animals'
+import PlantImage from '../img/plants.png'
 
-let app = new Application({
-  resolution: 4,
-  width: size,
-  height: size
-})
+Loader.shared.add('plant', PlantImage).load(init)
 
-app.renderer.backgroundColor = 0x4b7728
+function init() {
+  let app = new Application({
+    resolution: 4,
+    width: size,
+    height: size
+  })
 
-const c = app.view
+  app.renderer.backgroundColor = 0x4b7728
 
-c.style.width = `${size}px`
-c.style.height = `${size}px`
+  const c = app.view
 
-document.body.appendChild(c)
+  c.style.width = `${size}px`
+  c.style.height = `${size}px`
 
-const world = new World()
-app.stage.addChild(world)
+  document.body.appendChild(c)
 
-// Ticker
-setInterval(() => world.tick(), 1000)
+  const world = new World()
+  app.stage.addChild(world)
+
+  const animals = new Animals()
+  app.stage.addChild(animals)
+
+  // Ticker
+  setInterval(() => {
+    world.tick()
+    animals.tick()
+  }, 100)
+}

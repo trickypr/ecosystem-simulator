@@ -1,14 +1,14 @@
 import { size } from '../constants'
 import { IWorld, IWater, IPlant } from "./worldData"
-import { Container, Graphics } from 'pixi.js'
+import { Container, Graphics, Loader, Sprite } from 'pixi.js'
 
 const waterQuantity = 10,
   maxWaterSize = 100,
   minWaterSize = 10
 
-const plantQuantity = 100,
-  maxPlantRegen = 0.9,
-  minPlantRegen = 0.1,
+const plantQuantity = 20,
+  maxPlantRegen = 0.1,
+  minPlantRegen = 0.01,
   
 const maxPlantSize = 7,
   minPlantSize = 3
@@ -46,7 +46,7 @@ export class Water extends Graphics implements IWater {
   }
 }
 
-export class Plant extends Graphics implements IPlant {
+export class Plant extends Sprite implements IPlant {
   interactive = true
   
   color: number = 0x7bc043
@@ -59,7 +59,9 @@ export class Plant extends Graphics implements IPlant {
   y: number
 
   constructor() {
-    super()
+    super(Loader.shared.resources['plant'].texture)
+
+    this.anchor.set(0.5, 0.5)
     
     this.on('pointerdown', this.use)
   }
@@ -83,27 +85,16 @@ export class Plant extends Graphics implements IPlant {
   }
 
   use() {
-    this.clear()
     this.used = true
+    this.visible = false
   }
 
   tick() {
     if  (this.used && Math.random() - this.reGenChance <= 0) {
       this.used = false
-      this.draw()
+      this.visible = true
     }
   }
-
-  draw() {
-    this.beginFill(this.color, 0.2)
-    this.drawCircle(0, 0, this.size + 2)
-    this.endFill()
-
-    this.beginFill(this.color, 0.3)
-    this.drawCircle(0, 0, this.size)
-    this.endFill()
-  }
-
   checkCollision(x: number, y: number, radius: number): boolean {
     const dx = this.x - x
     const dy = this.y - y
@@ -115,9 +106,10 @@ export class Plant extends Graphics implements IPlant {
   }
 }
 
-export class World extends Container implements IWorld {
-  water: Water[] = []
-  plants: Plant[] = []
+export const water: Water[] = []
+export const plants: Plant[] = []
+
+export class World extends Container {
   // trees: ITree[]
 
   x = 0
@@ -126,21 +118,18 @@ export class World extends Container implements IWorld {
   constructor() {
     super()
 
-    for (let i = 0; i < waterQuantity; i++) this.water.push(new Water().random(minWaterSize, maxWaterSize))
-    for (let i = 0; i < plantQuantity; i++) this.plants.push(new Plant().random(minPlantRegen, maxPlantRegen, [...this.water, ...this.plants]))
+    for (let i = 0; i < waterQuantity; i++) water.push(new Water().random(minWaterSize, maxWaterSize))
+    for (let i = 0; i < plantQuantity; i++) plants.push(new Plant().random(minPlantRegen, maxPlantRegen, [...water, ...plants]))
 
-    this.water.forEach(water => {
-      water.draw()
-      this.addChild(water)
+    water.forEach(waterObject => {
+      waterObject.draw()
+      this.addChild(waterObject)
     })
 
-    this.plants.forEach(plant => {
-      plant.draw()
-      this.addChild(plant)
-    })
+    plants.forEach(plant => this.addChild(plant))
   }
 
   tick() {
-    this.plants.forEach(water => water.tick())
+    plants.forEach(plant => plant.tick())
   }
 }
